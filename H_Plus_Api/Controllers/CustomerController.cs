@@ -55,7 +55,9 @@ namespace H_Plus_Api.Controllers
         public async Task<IActionResult> DeleteCustomer([FromRoute] int id)
         {
             var customer = await _context.Customer.SingleOrDefaultAsync(m => m.CustomerId == id);
-            return Ok();
+            _context.Customer.Remove(customer);
+            await _context.SaveChangesAsync();
+            return Ok(customer);
         }
     }
 }
