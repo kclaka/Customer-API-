@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using H_Plus_Api.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace H_Plus_Api.Controllers
 {
@@ -26,10 +27,10 @@ namespace H_Plus_Api.Controllers
             return new ObjectResult(_context.Customer);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetCustomer")]
         public async Task<IActionResult> GetCustomer([FromRoute] int id)
         {
-            var customer = await _context.Customer.SingleOrDefault(m => m.CustomerId = id);
+            var customer = await _context.Customer.SingleOrDefaultAsync(m => m.CustomerId == id);
             return Ok(customer);
         }
 
@@ -42,14 +43,18 @@ namespace H_Plus_Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public IActionResult PutCustomer([FromRoute] int id, [FromBody] object obj)
+        public async Task<IActionResult> PutCustomer([FromRoute] int id, [FromBody] Customer customer)
         {
-            return Ok();
+            _context.Entry(customer).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return Ok(customer);
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteCustomer([FromRoute] int id)
+        public async Task<IActionResult> DeleteCustomer([FromRoute] int id)
         {
+            var customer = await _context.Customer.SingleOrDefaultAsync(m => m.CustomerId == id);
             return Ok();
         }
     }
